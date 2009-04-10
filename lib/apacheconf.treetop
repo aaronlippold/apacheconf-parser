@@ -3,8 +3,7 @@ grammar ApacheConf
         line*
         {
             def value
-                v = HttpdconfParser.rec_collect self
-                v
+                HttpdconfParser.rec_collect self
             end
         }
     end
