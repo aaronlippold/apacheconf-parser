@@ -54,6 +54,13 @@ describe HttpdconfParser do
      }
     ]
   end
+  
+  it "should allow the port specification in a virtualhost header to be optional" do
+    file_content = "<VirtualHost 10.11.12.13></VirtualHost>"
+    @fh.should_receive(:read).and_return(file_content)
+    parser = HttpdconfParser.new
+    parser.ast.should == [{:entries=>[], :ip_addr=>[10, 11, 12, 13]}]
+  end
 
   it "should ignore comments" do
     file_content = "# this is a comment"

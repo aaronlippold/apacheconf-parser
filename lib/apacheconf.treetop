@@ -60,12 +60,12 @@ grammar ApacheConf
     end
     
     rule vhost_header
-        '<VirtualHost' space ip_addr ':' number '>'
+        '<VirtualHost' space ip_addr ':'? port_num:number? '>'
         {
             def value
                 port = nil
-                if !number.nil?
-                    port = number.text_value.to_i
+                if !port_num.nil? && !port_num.text_value.empty?
+                    port = port_num.text_value.to_i
                 end
                 
                 v = { :ip_addr => ip_addr.value[:ip_addr] }
