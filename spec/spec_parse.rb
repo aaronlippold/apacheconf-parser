@@ -73,6 +73,7 @@ describe HttpdconfParser do
       ServerAlias www2.test123.co.za
       DocumentRoot /usr/www/users/blah
       <Directory /usr/www/users/blah>
+        # and another comment goes here   
         Options Indexes Includes FollowSymLinks ExecCGI
       </Directory>
     </VirtualHost>"
