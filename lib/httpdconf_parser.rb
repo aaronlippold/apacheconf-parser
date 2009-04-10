@@ -1,6 +1,5 @@
 require 'rubygems'
 require 'treetop'
-require File.join(File.dirname(__FILE__), 'core_ext/hash_ext')
 Treetop.load File.join(File.dirname(__FILE__), "../lib/apacheconf")
 
 class HttpdconfParser

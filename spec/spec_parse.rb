@@ -18,28 +18,6 @@ describe HttpdconfParser do
       <VirtualHost>
     }
     
-    @big_vhentry = %{
-      <VirtualHost 41.204.202.32> 
-          ServerAdmin webmaster@hrworks.co.za
-          ServerName hrworks.co.za
-          ServerAlias www.hrworks.co.za 
-          ServerAlias hrworks.co.za.* 
-          DocumentRoot /usr/www/users/hrworke
-          php_admin_value open_basedir /usr/www/users/hrworke:/usr/home/hrworke:/tmp:/usr/share/php
-          php_admin_value allow_url_fopen Off
-          # hos_config 
-          <Directory "/usr/www/users/hrworke"> 
-              Options Indexes Includes FollowSymLinks ExecCGI
-              AddHandler php-script .php5
-              Action php-script /cgi-sys/php5
-              AddType application/x-httpd-php .php .php3 .php4
-              Action application/x-httpd-php5 /cgi-sys/php5
-              AddType application/x-httpd-php5 .php5
-          </Directory>
-          # hos_config 
-      </VirtualHost>
-    }
-    
     @fh = mock("File", :null_object => true)
     File.should_receive(:new).with("/etc/apache/httpd.conf").and_return(@fh)
   end
@@ -53,34 +31,6 @@ describe HttpdconfParser do
     parser = HttpdconfParser.new
     parser.file_content.should == @file_content
   end
-  
-  # it "should parse valid minimal vhosts without error" do
-  #   @file_content = "<VirtualHost 10.20.30.10:123>        \n\n
-  #       ServerName test123.co.za
-  #       ServerAlias www.test123.co.za
-  #       ServerAlias www2.test123.co.za
-  #       DocumentRoot /usr/www/users/test
-  #   </VirtualHost>"
-  #   @fh.should_receive(:read).and_return(@file_content)
-  #   parser = HttpdconfParser.new
-  #   parser.ast.should == {:header=>{:port=>"123", 
-  #                                   :ip_addr=>"10.20.30.10"}, 
-  #                         :servername=>"test123.co.za", :directives=>{:serveralias=>["www.test123.co.za", "www2.test123.co.za"],
-  #                                                                     :servername=>"test123.co.za", 
-  #                                                                     :documentroot=>"/usr/www/users/test"}}
-  # end
-  # 
-  # it "should parse valid minimal directory entries without error" do
-  #   @file_content = "<VirtualHost 10.20.30.10:123>        \n\n
-  #     ServerName test123.co.za
-  #   <Directory /usr/www/users/blah>
-  #     Options Indexes Includes FollowSymLinks ExecCGI
-  #   </Directory>
-  #   </VirtualHost>"
-  #   @fh.should_receive(:read).and_return(@file_content)
-  #   parser = HttpdconfParser.new
-  #   parser.ast.should == {:directory => "/usr/www/users/blah", :directives => {:options => ['Indexes', 'Includes', 'FollowSymLinks', 'ExecCGI']}} 
-  # end
   
   it "should parse a directive into a hash" do
     @file_content = "Options Indexes Includes FollowSymLinks ExecCGI"
