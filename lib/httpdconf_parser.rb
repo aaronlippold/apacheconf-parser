@@ -1,6 +1,6 @@
 require 'rubygems'
 require 'treetop'
-Treetop.load File.join(File.dirname(__FILE__), "../lib/apacheconf")
+require File.join(File.dirname(__FILE__), "../lib/apacheconf")
 
 class HttpdconfParser
   def initialize(path = nil)
@@ -17,8 +17,7 @@ class HttpdconfParser
     @fh.close    
     @parser = ApacheConfParser.new
   end
-  
-  
+    
   def file_content
     @file_content
   end
@@ -27,18 +26,23 @@ class HttpdconfParser
     if e.respond_to?(:elements) && !e.elements.nil?
       vv = []
       vv << e.elements.collect do |ee|
-        (ee.value if ee.respond_to?(:value)) || self.rec_collect(ee, v)
+        if ee.respond_to?(:value) && !(ee.value.nil? || ee.value.empty?)
+          ee.value
+        else
+          self.rec_collect(ee, v)
+        end
       end
       if !vv.flatten.empty?
         v = vv
       end
     else
-      v << e.value if e.respond_to?(:value)
+      if e.respond_to?(:value) && !(e.value.nil? || e.value.empty?)
+        v << e.value 
+      end
     end
     v
   end
 
-  
   def ast
     ast = @parser.parse self.file_content
     if ast.nil?
@@ -46,7 +50,11 @@ class HttpdconfParser
       return
     end
     #puts ast
-    ast.value
+    if ast.value != nil
+      ast.value.flatten
+    else 
+      []
+    end
   end
   
 end

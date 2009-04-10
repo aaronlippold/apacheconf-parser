@@ -55,10 +55,18 @@ describe HttpdconfParser do
     ]
   end
 
+  it "should ignore comments" do
+    file_content = "# this is a comment"
+    @fh.should_receive(:read).and_return(file_content)
+    parser = HttpdconfParser.new
+    parser.ast.should == []
+  end
+
   it "should parse a vhost entry into a hash" do
     file_content = "
     ServerName blah.co.za
     Options some options
+    # lets add a comment here
     <VirtualHost 10.10.10.2:123>
       ServerName www.test123.co.za
       ServerAlias www1.test123.co.za

@@ -10,7 +10,7 @@ grammar ApacheConf
     end
     
     rule line
-        directive / vh_entry / dir_entry
+        comment / directive / vh_entry / dir_entry
         {
             def value
                 super
@@ -89,6 +89,10 @@ grammar ApacheConf
                 { :directory => word.text_value }
             end
         }
+    end
+    
+    rule comment
+        white '#' space (space word)* space white
     end
     
     rule dir_footer
