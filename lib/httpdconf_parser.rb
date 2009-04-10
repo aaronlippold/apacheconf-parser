@@ -6,13 +6,11 @@ class HttpdconfParser
   def initialize(path = nil)
     @fh = nil
     @file_content = nil
-    
     if !path
       @fh = File.new('/etc/apache/httpd.conf')
     else
       @fh = File.new(path)
     end
-    
     @file_content = @fh.read
     @fh.close    
     @parser = ApacheConfParser.new
@@ -38,7 +36,8 @@ class HttpdconfParser
     else
       v = e.value if e.respond_to?(:value) and !e.value.nil?
     end
-    v
+    # remove empty arrays
+    v.delete_if { |i| i.empty? }
   end
 
   def ast
@@ -46,12 +45,11 @@ class HttpdconfParser
     # the parsed hash
     ast = @parser.parse self.file_content
     if ast.nil?
-      p @parser.failure_reason
+      puts @parser.failure_reason
       return nil
     end
     unless ast.value.nil?
-      # remove empty arrays
-      ast.value.delete_if { |i| i.empty? }
+      ast.value
     else 
       []
     end
