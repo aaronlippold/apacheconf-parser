@@ -1,0 +1,121 @@
+grammar ApacheConf
+    rule conf
+        line*
+        {
+            def value
+                v = HttpdconfParser.rec_collect self
+                v[0]
+            end
+        }
+    end
+    
+    rule line
+        directive / vh_entry / dir_entry
+        {
+            def value
+                super || text_value
+            end
+        }
+    end
+
+    rule vh_entry
+        white vhost_header entries:(white line white)* vhost_footer white
+        {
+            def value
+                lines = HttpdconfParser.rec_collect entries
+                # lines = entries.elements[0].value
+                v = vhost_header.value
+                v[:entries] = lines.flatten
+                #v[:vhost] = v[:entries][:servername]
+                v
+            end
+        }
+    end
+    
+    rule dir_entry
+        white dir_header entries:(white line white)* white dir_footer white
+        {
+            def value
+                lines = HttpdconfParser.rec_collect entries
+                v = dir_header.value
+                v[:entries] = lines.flatten
+                v 
+            end
+        }        
+    end
+
+    rule ip_addr
+        p1:number '.' p2:number '.' p3:number '.' p4:number
+        {
+            def value
+                {:ip_addr => [p1.text_value.to_i, p2.text_value.to_i, p3.text_value.to_i, p4.text_value.to_i]}
+            end
+        }
+    end
+
+    rule directive
+        white keyword words:(space word space)+ white
+        {
+            def value
+                { keyword.text_value.to_sym => words.elements.collect { |e| e.text_value.strip } }
+            end
+        }
+    end
+    
+    rule vhost_header
+        '<VirtualHost' space ip_addr ':' number '>'
+        {
+            def value
+                port = nil
+                if !number.nil?
+                    port = number.text_value.to_i
+                end
+                
+                v = { :ip_addr => ip_addr.value[:ip_addr] }
+                if port
+                    v[:port] = port
+                end
+                v
+            end
+        }
+    end
+
+    rule vhost_footer
+        '</VirtualHost>'
+    end
+    
+    rule dir_header
+        '<Directory' space word '>'
+        {
+            def value
+                { :directory => word.text_value }
+            end
+        }
+    end
+    
+    rule dir_footer
+        '</Directory>'
+    end
+            
+    rule keyword
+        'Options' / 'ServerName' / 'ServerAlias' / 'DocumentRoot'
+    end
+
+    rule space
+        [ \t]*
+    end
+
+    rule white
+        [ \t\n\r\f]*
+    end
+    
+    rule word
+        [a-zA-Z_.,/0-9]+
+    end
+    
+    rule number
+        [0-9]+
+    end
+
+end
+    
