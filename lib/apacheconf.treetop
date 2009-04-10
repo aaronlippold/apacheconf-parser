@@ -13,7 +13,7 @@ grammar ApacheConf
         directive / vh_entry / dir_entry
         {
             def value
-                super || text_value
+                super
             end
         }
     end
@@ -23,10 +23,8 @@ grammar ApacheConf
         {
             def value
                 lines = HttpdconfParser.rec_collect entries
-                # lines = entries.elements[0].value
                 v = vhost_header.value
                 v[:entries] = lines.flatten
-                #v[:vhost] = v[:entries][:servername]
                 v
             end
         }
