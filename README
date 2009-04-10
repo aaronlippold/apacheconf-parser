@@ -1,0 +1,15 @@
+Description:
+
+This is an attempt at building a parser for the apache httpd.conf file format 
+using treetop and ruby. This is mainly an exercise in self-education and there 
+may be more complete and more robust libraries out there doing exactly the same 
+thing only better. This project has no goals of being "production ready" or even
+useful in the near future.
+
+Dependencies:
+
+rspec / treetop / rubygems
+
+Installation Instructions:
+
+None yet, you can run the rspec specifications from the /spec subdirectory
