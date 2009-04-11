@@ -164,9 +164,7 @@ describe HttpdconfParser do
   context "when set to work on an actual httpd.conf file" do
     it "should parse an entire httpd.conf file" do
       path = 'httpd.conf'
-      # @fh.should_receive(:read).and_return(file_content)
       parser = HttpdconfParser.new(path)
-      # puts parser.file_content
       parser.ast.should_not == nil
     end
   
