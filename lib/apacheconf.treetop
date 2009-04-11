@@ -51,7 +51,7 @@ grammar ApacheConf
     end
 
     rule directive
-        white keyword:word words:(space word space)+ white
+        white keyword words:(space word space)+ white
         {
             def value
                 { keyword.text_value.to_sym => words.elements.collect { |e| e.text_value.strip } }
@@ -78,7 +78,7 @@ grammar ApacheConf
     end
 
     rule vhost_footer
-        '</VirtualHost>'
+        white '</VirtualHost>' white
     end
     
     rule dir_header
@@ -91,7 +91,7 @@ grammar ApacheConf
     end
     
     rule comment
-        '#' ((!"\n" . )*)?
+        white '#' (!"\n" . )* white
         {
             def value
                 []
@@ -100,16 +100,15 @@ grammar ApacheConf
     end
     
     rule dir_footer
-        '</Directory>'
+        white '</Directory>' white
     end
             
-    # rule keyword
-    #     'ServerRoot' / 'ResourceConfig' / 'AccessConfig' / 'Port' / 'include' / 'NameVirtualHost' / 'php_admin_value' / 'AddType' / 'Action' / 'ServerAdmin' / 'SSLEngine' / 'SSLCertificateFile' / 'SSLCertificateKeyFile' / 'SSLLogLevel' / 'SSLVerifyClient' / 'SSLVerifyDepth' / 'Options' / 'ServerName' / 'ServerAlias' / 'DocumentRoot'
-    # end
-
+    rule keyword
+         'ServerRoot' / 'ResourceConfig' / 'AccessConfig' / 'Port' / 'include' / 'NameVirtualHost' / 'php_admin_value' / 'AddType' / 'Action' / 'ServerAdmin' / 'SSLEngine' / 'SSLCertificateFile' / 'SSLCertificateKeyFile' / 'SSLLogLevel' / 'SSLVerifyClient' / 'SSLVerifyDepth' / 'Options' / 'ServerName' / 'ServerAlias' / 'DocumentRoot' / 'AccessFileName' / 'AddHandler' / 'Redirect' / 'SSLCACertificateFile' / 'SSLOptions' / 'SetEnvIf' / 'SSLProtocol' / 'SSLCipherSuite' / 'ScriptAlias'
+    end
 
     rule space
-        [ \t]*
+        ("\\\n" / [ \t])*
     end
 
     rule white
@@ -117,7 +116,7 @@ grammar ApacheConf
     end
     
     rule word
-        [a-zA-Z_.,/0-9""]+
+        [a-zA-Z_.,/0-9"'#@\-\*:~\+\!]+
     end
     
     rule number

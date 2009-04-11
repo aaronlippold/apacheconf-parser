@@ -57,7 +57,8 @@ describe HttpdconfParser do
     end
   
     it "should allow the port specification in a virtualhost header to be optional" do
-      file_content = "<VirtualHost 10.11.12.13></VirtualHost>"
+      file_content = "<VirtualHost 10.11.12.13>
+      </VirtualHost>"
       @fh.should_receive(:read).and_return(file_content)
       parser = HttpdconfParser.new
       parser.ast.should == [{:entries=>[], :ip_addr=>[10, 11, 12, 13]}]
@@ -74,6 +75,7 @@ describe HttpdconfParser do
       file_content = "
       ServerName blah.co.za
       Options some options
+      ####
       # lets add a comment here
       <VirtualHost 10.10.10.2:123>
         ServerName www.test123.co.za
@@ -106,50 +108,68 @@ describe HttpdconfParser do
         }
       ]
     end
-  # end
-  # 
-  # context "httpd.conf file from www32" do
-    it "should parse an entire httpd.conf file" do
-      # path = '/Users/wvd/work/parse_httpd.conf/httpd.conf'
+    
+    it "should parse a multiline directive broken up with '\\' characters" do
       file_content = %{
-        ServerRoot "/etc/apache"
-        ResourceConfig /etc/apache/srm.conf
-        AccessConfig /etc/apache/access.conf
-
-        Port 80
-        include /etc/apache/httpd.conf_main
-        include /etc/apache/mod_gzip.conf
-
-
-
-
-        ### Section 3: Virtual Hosts
-
-
-        #
-
-
-
-
-        # VirtualHost: If you want to maintain multiple domains/hostnames on your
-        # machine you can setup VirtualHost containers for them.
-        # Please see the documentation at <URL:http://www.apache.org/docs/vhosts/>
-        # for further details before you try to setup virtual hosts.
-        # You may use the command line option '-S' to verify your virtual host
-        # configuration.
-
-        #
-        # If you want to use name-based virtual hosts you need to define at
-        # least one IP address (and port number) for them.
-        #
-        #NameVirtualHost 12.34.56.78:80
+        SetEnvIf User-Agent ".*MSIE.*" \
+        nokeepalive ssl-unclean-shutdown \
+          downgrade-1.0 force-response-1.0
       }
       @fh.should_receive(:read).and_return(file_content)
       parser = HttpdconfParser.new
-      # puts parser.file_content
-      parser.ast.should == {}
+      parser.ast.should == 
+      [
+        {:SetEnvIf=>
+          ["User-Agent", "\".*MSIE.*\"", "nokeepalive", "ssl-unclean-shutdown", "downgrade-1.0", "force-response-1.0"]
+        }
+      ]
     end
-
+    
+    it "should parse the common SSL directives" do
+      file_content = %{
+           # hos_config
+              SSLEngine on
+      	SSLCACertificateFile /etc/apache/ssl.crt/ourca.crt
+              SSLCertificateFile /etc/apache/ssl.crt/ourcrtfile.crt
+              SSLCertificateKeyFile /etc/apache/ssl.key/ourkeyfile.key
+              SSLOptions +FakeBasicAuth +ExportCertData +CompatEnvVars +StrictRequire
+              SSLLogLevel warn
+              SSLVerifyClient 0
+              SSLVerifyDepth 1
+              SetEnvIf User-Agent ".*MSIE.*" \
+              nokeepalive ssl-unclean-shutdown \
+                downgrade-1.0 force-response-1.0
+              SSLProtocol all
+              SSLCipherSuite ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EX
+      }
+      @fh.should_receive(:read).and_return(file_content)
+      parser = HttpdconfParser.new
+      parser.ast.should == 
+      [
+        {:SSLEngine=>["on"]}, 
+        {:SSLCACertificateFile=>["/etc/apache/ssl.crt/ourca.crt"]}, 
+        {:SSLCertificateFile=>["/etc/apache/ssl.crt/ourcrtfile.crt"]}, 
+        {:SSLCertificateKeyFile=>["/etc/apache/ssl.key/ourkeyfile.key"]}, 
+        {:SSLOptions=>["+FakeBasicAuth", "+ExportCertData", "+CompatEnvVars", "+StrictRequire"]}, 
+        {:SSLLogLevel=>["warn"]}, 
+        {:SSLVerifyClient=>["0"]}, 
+        {:SSLVerifyDepth=>["1"]}, 
+        {:SetEnvIf=>["User-Agent", "\".*MSIE.*\"", "nokeepalive", "ssl-unclean-shutdown", "downgrade-1.0", "force-response-1.0"]}, 
+        {:SSLProtocol=>["all"]}, 
+        {:SSLCipherSuite=>["ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EX"]}
+      ]
+    end
+  end
+  
+  context "when set to work on an actual httpd.conf file" do
+    it "should parse an entire httpd.conf file" do
+      path = 'httpd.conf'
+      # @fh.should_receive(:read).and_return(file_content)
+      parser = HttpdconfParser.new(path)
+      # puts parser.file_content
+      parser.ast.should_not == nil
+    end
+  
   end
     
 end
