@@ -9,7 +9,7 @@ grammar ApacheConf
     end
     
     rule line
-        comment / directive / vh_entry / dir_entry
+        directive / comment / vh_entry / dir_entry
         {
             def value
                 super
@@ -51,7 +51,7 @@ grammar ApacheConf
     end
 
     rule directive
-        white keyword words:(space word space)+ white
+        white keyword:word words:(space word space)+ white
         {
             def value
                 { keyword.text_value.to_sym => words.elements.collect { |e| e.text_value.strip } }
@@ -91,16 +91,22 @@ grammar ApacheConf
     end
     
     rule comment
-        white '#' space (space word)* space white
+        '#' ((!"\n" . )*)?
+        {
+            def value
+                []
+            end
+        }
     end
     
     rule dir_footer
         '</Directory>'
     end
             
-    rule keyword
-        'Options' / 'ServerName' / 'ServerAlias' / 'DocumentRoot'
-    end
+    # rule keyword
+    #     'ServerRoot' / 'ResourceConfig' / 'AccessConfig' / 'Port' / 'include' / 'NameVirtualHost' / 'php_admin_value' / 'AddType' / 'Action' / 'ServerAdmin' / 'SSLEngine' / 'SSLCertificateFile' / 'SSLCertificateKeyFile' / 'SSLLogLevel' / 'SSLVerifyClient' / 'SSLVerifyDepth' / 'Options' / 'ServerName' / 'ServerAlias' / 'DocumentRoot'
+    # end
+
 
     rule space
         [ \t]*
@@ -111,7 +117,7 @@ grammar ApacheConf
     end
     
     rule word
-        [a-zA-Z_.,/0-9]+
+        [a-zA-Z_.,/0-9""]+
     end
     
     rule number

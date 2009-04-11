@@ -46,6 +46,7 @@ class HttpdconfParser
     ast = @parser.parse self.file_content
     if ast.nil?
       puts @parser.failure_reason
+#      p @parser
       return nil
     end
     unless ast.value.nil?
