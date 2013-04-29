@@ -165,7 +165,7 @@ describe HttpdconfParser do
   
   context "when set to work on an actual httpd.conf file" do
     it "should parse an entire httpd.conf file" do
-      path = 'spec/httpd.conf'
+      path = 'httpd.conf'
       parser = HttpdconfParser.new(path)
       parser.ast.should_not == nil
     end
