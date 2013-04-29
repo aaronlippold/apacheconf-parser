@@ -1,6 +1,6 @@
 require 'rubygems'
-require 'spec'
-require 'spec/expectations'
+require 'rspec'
+require 'rspec/expectations'
 require 'treetop'
 require File.join(File.dirname(__FILE__), "../lib/httpdconf_parser")
 
@@ -21,9 +21,11 @@ describe HttpdconfParser do
     
       @fh = mock("File", :null_object => true)
       File.should_receive(:new).with("/etc/apache/httpd.conf").and_return(@fh)
+      @fh.should_receive(:close).and_return(nil)
     end
 
     it "should open httpd.conf in its default location on debian servers" do
+      @fh.should_receive(:read).and_return(@file_content)
       parser = HttpdconfParser.new
     end
   
@@ -163,7 +165,7 @@ describe HttpdconfParser do
   
   context "when set to work on an actual httpd.conf file" do
     it "should parse an entire httpd.conf file" do
-      path = 'httpd.conf'
+      path = 'spec/httpd.conf'
       parser = HttpdconfParser.new(path)
       parser.ast.should_not == nil
     end
