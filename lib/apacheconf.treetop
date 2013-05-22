@@ -9,7 +9,7 @@ grammar ApacheConf
     end
     
     rule line
-        logformat / directive / comment / vh_entry / dir_entry / ifdef_entry / ifmod_entry / files_entry / loc_entry / alias 
+        customlog / logformat / directive / comment / vh_entry / dir_entry / ifdef_entry / ifmod_entry / files_entry / loc_entry / alias 
         {
             def value
                 super
@@ -23,7 +23,7 @@ grammar ApacheConf
             def value
                 lines = HttpdconfParser.rec_collect entries
                 v = vhost_header.value
-                v[:entries] = lines.flatten
+                v[:entries] = lines
                 v
             end
         }
@@ -35,7 +35,7 @@ grammar ApacheConf
             def value
                 lines = HttpdconfParser.rec_collect entries
                 v = dir_header.value
-                v[:entries] = lines.flatten
+                v[:entries] = lines
                 v 
             end
         }        
@@ -47,7 +47,7 @@ grammar ApacheConf
             def value
                 lines = HttpdconfParser.rec_collect entries
                 v = ifdef_header.value
-                v[:entries] = lines.flatten
+                v[:entries] = lines
                 v 
             end
         }        
@@ -59,7 +59,7 @@ grammar ApacheConf
             def value
                 lines = HttpdconfParser.rec_collect entries
                 v = ifmod_header.value
-                v[:entries] = lines.flatten
+                v[:entries] = lines
                 v 
             end
         }        
@@ -71,7 +71,7 @@ grammar ApacheConf
             def value
                 lines = HttpdconfParser.rec_collect entries
                 v = files_header.value
-                v[:entries] = lines.flatten
+                v[:entries] = lines
                 v 
             end
         }        
@@ -83,7 +83,7 @@ grammar ApacheConf
             def value
                 lines = HttpdconfParser.rec_collect entries
                 v = loc_header.value
-                v[:entries] = lines.flatten
+                v[:entries] = lines
                 v 
             end
         }        
@@ -123,6 +123,15 @@ grammar ApacheConf
         {
             def value
                 { :logformat => [string.text_value, word.text_value.strip] }
+            end
+        }
+    end
+ 
+    rule customlog
+        white 'CustomLog' white path space s:(string / word) white
+        {
+            def value
+                { :customlog => [path.text_value.strip, s.text_value] }
             end
         }
     end
@@ -233,7 +242,7 @@ grammar ApacheConf
     end
             
     rule keyword
-         'ServerRoot' / 'ResourceConfig' / 'AccessConfig' / 'Port' / 'include' / 'NameVirtualHost' / 'php_admin_value' / 'AddType' / 'Action' / 'ServerAdmin' / 'SSLEngine' / 'SSLCertificateFile' / 'SSLCertificateKeyFile' / 'SSLLogLevel' / 'SSLVerifyClient' / 'SSLVerifyDepth' / 'Options' / 'ServerName' / 'ServerAlias' / 'DocumentRoot' / 'AccessFileName' / 'AddHandler' / 'Redirect' / 'SSLCACertificateFile' / 'SSLOptions' / 'SetEnvIf' / 'SSLProtocol' / 'SSLCipherSuite' / 'ScriptAlias' / 'ServerType' / 'PidFile' / 'ScoreBoardFile' / 'Timeout' / 'KeepAlive' / 'MaxKeepAliveRequests' / 'KeepAliveTimeout' / 'MinSpareServers' / 'MaxSpareServers' / 'StartServers' / 'MaxClients' / 'MaxRequestsPerChild' / 'MaxCPUPerChild' / 'MaxDATAPerChild' / 'MaxNOFILEPerChild' / 'MaxRSSPerChild' / 'MaxSTACKPerChild' / 'Include' / 'Listen' / 'User' / 'Group' / 'AllowOverride' / 'Order' / 'Allow' / 'DirectoryIndex' / 'AccessFileName' / 'Deny' / 'UseCanonicalName' / 'TypesConfig' / 'DefaultType'/ 'MIMEMagicFile' / 'HostnameLookups' / 'ErrorLog' / 'LogLevel' / 'CustomLog' / 'IndexOptions' / 'AddIconByType' / 'AddIconByEncoding' / 'AddIcon' / 'DefaultIcon' /'ReadmeName' /'HeaderName' /'IndexIgnore' /'AddEncoding' /'AddLanguage' /'LanguagePriority' /'AddType' /'BrowserMatch' /'SSLPassPhraseDialog' /'SSLSessionCache' /'SSLSessionCacheTimeout' /'SSLMutex' /'SSLRandomSeed' /'SSLLog' /'SSLLogLevel' / 'SetHandler' / 'TransferLog'
+         'ServerRoot' / 'ResourceConfig' / 'AccessConfig' / 'Port' / 'include' / 'NameVirtualHost' / 'php_admin_value' / 'AddType' / 'Action' / 'ServerAdmin' / 'SSLEngine' / 'SSLCertificateFile' / 'SSLCertificateKeyFile' / 'SSLLogLevel' / 'SSLVerifyClient' / 'SSLVerifyDepth' / 'Options' / 'ServerName' / 'ServerAlias' / 'DocumentRoot' / 'AccessFileName' / 'AddHandler' / 'Redirect' / 'SSLCACertificateFile' / 'SSLOptions' / 'SetEnvIf' / 'SSLProtocol' / 'SSLCipherSuite' / 'ScriptAlias' / 'ServerType' / 'PidFile' / 'ScoreBoardFile' / 'Timeout' / 'KeepAlive' / 'MaxKeepAliveRequests' / 'KeepAliveTimeout' / 'MinSpareServers' / 'MaxSpareServers' / 'StartServers' / 'MaxClients' / 'MaxRequestsPerChild' / 'MaxCPUPerChild' / 'MaxDATAPerChild' / 'MaxNOFILEPerChild' / 'MaxRSSPerChild' / 'MaxSTACKPerChild' / 'Include' / 'Listen' / 'UserDir' / 'User' / 'Group' / 'AllowOverride' / 'Order' / 'Allow' / 'DirectoryIndex' / 'AccessFileName' / 'Deny' / 'UseCanonicalName' / 'TypesConfig' / 'DefaultType'/ 'MIMEMagicFile' / 'HostnameLookups' / 'ErrorLog' / 'LogLevel' / 'CustomLog' / 'IndexOptions' / 'AddIconByType' / 'AddIconByEncoding' / 'AddIcon' / 'DefaultIcon' /'ReadmeName' /'HeaderName' /'IndexIgnore' /'AddEncoding' /'AddLanguage' /'LanguagePriority' /'AddType' /'BrowserMatch' /'SSLPassPhraseDialog' /'SSLSessionCache' /'SSLSessionCacheTimeout' /'SSLMutex' /'SSLRandomSeed' /'SSLLog' /'SSLLogLevel' / 'SetHandler' / 'TransferLog'
     end
 
     rule space
@@ -245,6 +254,10 @@ grammar ApacheConf
     end
     
     rule word
+        [()a-zA-Z_.,/0-9"'#@\-\*:~\+\!\^\?\.\\;%{}_]+
+    end
+    
+    rule path
         [()a-zA-Z_.,/0-9"'#@\-\*:~\+\!\^\?\.\\;%{}_]+
     end
     
