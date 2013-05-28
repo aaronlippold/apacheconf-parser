@@ -1,9 +1,9 @@
-grammar ApacheConf
+grammar ApacheConfGrammar
     rule conf
         line*
         {
             def value
-                HttpdconfParser.rec_collect self
+                ApacheconfParser.rec_collect self
             end
         }
     end
@@ -21,7 +21,7 @@ grammar ApacheConf
         white vhost_header entries:(white line white)* vhost_footer white
         {
             def value
-                lines = HttpdconfParser.rec_collect entries
+                lines = ApacheconfParser.rec_collect entries
                 v = vhost_header.value
                 v[:entries] = lines.flatten
                 v
@@ -33,7 +33,7 @@ grammar ApacheConf
         white dir_header entries:(white line white)* white dir_footer white
         {
             def value
-                lines = HttpdconfParser.rec_collect entries
+                lines = ApacheconfParser.rec_collect entries
                 v = dir_header.value
                 v[:entries] = lines[0]
                 v 
@@ -45,7 +45,7 @@ grammar ApacheConf
         white ifdef_header entries:(white line white)* white ifdef_footer white
         {
             def value
-                lines = HttpdconfParser.rec_collect entries
+                lines = ApacheconfParser.rec_collect entries
                 v = ifdef_header.value
                 v[:entries] = lines
                 v 
@@ -57,7 +57,7 @@ grammar ApacheConf
         white ifmod_header entries:(white line white)* white ifmod_footer white
         {
             def value
-                lines = HttpdconfParser.rec_collect entries
+                lines = ApacheconfParser.rec_collect entries
                 v = ifmod_header.value
                 v[:entries] = lines
                 v 
@@ -69,7 +69,7 @@ grammar ApacheConf
         white files_header entries:(white line white)* white files_footer white
         {
             def value
-                lines = HttpdconfParser.rec_collect entries
+                lines = ApacheconfParser.rec_collect entries
                 v = files_header.value
                 v[:entries] = lines
                 v 
@@ -81,7 +81,7 @@ grammar ApacheConf
         white loc_header entries:(white line white)* white loc_footer white
         {
             def value
-                lines = HttpdconfParser.rec_collect entries
+                lines = ApacheconfParser.rec_collect entries
                 v = loc_header.value
                 v[:entries] = lines
                 v 
