@@ -23,7 +23,7 @@ grammar ApacheConf
             def value
                 lines = HttpdconfParser.rec_collect entries
                 v = vhost_header.value
-                v[:entries] = lines
+                v[:entries] = lines.flatten
                 v
             end
         }
@@ -35,7 +35,7 @@ grammar ApacheConf
             def value
                 lines = HttpdconfParser.rec_collect entries
                 v = dir_header.value
-                v[:entries] = lines
+                v[:entries] = lines[0]
                 v 
             end
         }        

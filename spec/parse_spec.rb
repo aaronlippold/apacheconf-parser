@@ -63,7 +63,7 @@ describe HttpdconfParser do
       </VirtualHost>"
       @fh.should_receive(:read).and_return(file_content)
       parser = HttpdconfParser.new
-      parser.ast.should == [{:entries=>[], :ip_addr=>[10, 11, 12, 13]}]
+      parser.ast.should == [{ :ip_addr=>[10, 11, 12, 13], :entries=>[]}]
     end
 
     it "should ignore comments" do
@@ -165,7 +165,7 @@ describe HttpdconfParser do
   
   context "when set to work on an actual httpd.conf file" do
     it "should parse an entire httpd.conf file" do
-      path = 'httpd.conf'
+      path = 'spec/httpd.conf'
       parser = HttpdconfParser.new(path)
       parser.ast.should_not == nil
     end
