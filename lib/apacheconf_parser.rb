@@ -2,7 +2,7 @@ require 'rubygems'
 require 'treetop'
 require File.join(File.dirname(__FILE__), "../lib/apacheconf")
 
-class HttpdconfParser
+class ApacheconfParser
   def initialize(path = nil)
     @fh = nil
     @file_content = nil
@@ -13,7 +13,7 @@ class HttpdconfParser
     end
     @file_content = @fh.read
     @fh.close    
-    @parser = ApacheConfParser.new
+    @parser = ApacheConfGrammarParser.new
   end
     
   def file_content

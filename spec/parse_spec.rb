@@ -1,11 +1,11 @@
 require 'rubygems'
-require 'spec'
-require 'spec/expectations'
+require 'rspec'
+require 'rspec/expectations'
 require 'treetop'
-require File.join(File.dirname(__FILE__), "../lib/httpdconf_parser")
+require File.join(File.dirname(__FILE__), "../lib/apacheconf_parser")
 
 
-describe HttpdconfParser do
+describe ApacheconfParser do
   context "general parser machinery" do
     before(:each) do
       @file_content = %{
@@ -21,22 +21,24 @@ describe HttpdconfParser do
     
       @fh = mock("File", :null_object => true)
       File.should_receive(:new).with("/etc/apache/httpd.conf").and_return(@fh)
+      @fh.should_receive(:close).and_return(nil)
     end
 
     it "should open httpd.conf in its default location on debian servers" do
-      parser = HttpdconfParser.new
+      @fh.should_receive(:read).and_return(@file_content)
+      parser = ApacheconfParser.new
     end
   
     it "should read the content of the httpd.conf file into memory" do
       @fh.should_receive(:read).and_return(@file_content)
-      parser = HttpdconfParser.new
+      parser = ApacheconfParser.new
       parser.file_content.should == @file_content
     end
   
     it "should parse a directive into a hash" do
       @file_content = "Options Indexes Includes FollowSymLinks ExecCGI"
       @fh.should_receive(:read).and_return(@file_content)
-      parser = HttpdconfParser.new
+      parser = ApacheconfParser.new
       parser.ast.should == [{:Options => ['Indexes', 'Includes', 'FollowSymLinks', 'ExecCGI'] }]
     end
   
@@ -45,7 +47,7 @@ describe HttpdconfParser do
         Options Indexes Includes FollowSymLinks ExecCGI
       </Directory>"
       @fh.should_receive(:read).and_return(@file_content)
-      parser = HttpdconfParser.new
+      parser = ApacheconfParser.new
       parser.ast.should == 
       [{:directory=>"/usr/www/users/blah", 
         :entries=>
@@ -60,14 +62,14 @@ describe HttpdconfParser do
       file_content = "<VirtualHost 10.11.12.13>
       </VirtualHost>"
       @fh.should_receive(:read).and_return(file_content)
-      parser = HttpdconfParser.new
-      parser.ast.should == [{:entries=>[], :ip_addr=>[10, 11, 12, 13]}]
+      parser = ApacheconfParser.new
+      parser.ast.should == [{ :ip_addr=>[10, 11, 12, 13], :entries=>[]}]
     end
 
     it "should ignore comments" do
       file_content = "# this is a comment"
       @fh.should_receive(:read).and_return(file_content)
-      parser = HttpdconfParser.new
+      parser = ApacheconfParser.new
       parser.ast.should == []
     end
 
@@ -88,7 +90,7 @@ describe HttpdconfParser do
         </Directory>
       </VirtualHost>"
       @fh.should_receive(:read).and_return(file_content)
-      parser = HttpdconfParser.new
+      parser = ApacheconfParser.new
       parser.ast.should == 
       [
         {:ServerName=>["blah.co.za"]}, 
@@ -116,7 +118,7 @@ describe HttpdconfParser do
           downgrade-1.0 force-response-1.0
       }
       @fh.should_receive(:read).and_return(file_content)
-      parser = HttpdconfParser.new
+      parser = ApacheconfParser.new
       parser.ast.should == 
       [
         {:SetEnvIf=>
@@ -143,7 +145,7 @@ describe HttpdconfParser do
               SSLCipherSuite ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EX
       }
       @fh.should_receive(:read).and_return(file_content)
-      parser = HttpdconfParser.new
+      parser = ApacheconfParser.new
       parser.ast.should == 
       [
         {:SSLEngine=>["on"]}, 
@@ -163,8 +165,8 @@ describe HttpdconfParser do
   
   context "when set to work on an actual httpd.conf file" do
     it "should parse an entire httpd.conf file" do
-      path = 'httpd.conf'
-      parser = HttpdconfParser.new(path)
+      path = 'spec/httpd.conf'
+      parser = ApacheconfParser.new(path)
       parser.ast.should_not == nil
     end
   
